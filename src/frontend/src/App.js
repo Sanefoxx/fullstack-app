@@ -11,7 +11,7 @@ function App() {
           .then(res => res.json())
           .then(data => {
             console.log(data);
-            setStudents(data)
+            setStudents(data);
           })
 
   useEffect(() => {
@@ -19,7 +19,13 @@ function App() {
       fetchStudents();
   }, []);
 
-  return <p>{students.length}</p>;
+  if (students.length <= 0) {
+    return "no data";
+  }
+
+  return students.map((student, index) => {
+    return <p key={index}>{student.id} {student.name} </p>;
+  })
 }
 
 export default App;
