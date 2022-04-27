@@ -1,17 +1,20 @@
 import { useState, useEffect} from "react";
 import { getAllStudents } from "./client";
 import './App.css';
-import {Layout,
+import {
+    Layout,
     Menu,
     Breadcrumb,
-    Table
+    Table,
+    Spin, Empty
 } from 'antd';
 import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  UserOutlined,
+    DesktopOutlined,
+    PieChartOutlined,
+    FileOutlined,
+    TeamOutlined,
+    UserOutlined,
+    LoadingOutlined,
 } from '@ant-design/icons';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -40,9 +43,12 @@ const columns = [
     },
 ];
 
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
 function App() {
   const [students, setStudents] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   const fetchStudents = () =>
       getAllStudents()
@@ -50,6 +56,7 @@ function App() {
           .then(data => {
             console.log(data);
             setStudents(data);
+            setFetching(false);
           })
 
   useEffect(() => {
@@ -58,10 +65,20 @@ function App() {
   }, []);
 
   const renderStudents = () => {
-      if (students.length <= 0) {
-          return "No data available";
+      if (fetching) {
+          return <Spin indicator={antIcon} />;
       }
-      return <Table dataSource={students} columns={columns} />;
+      if (students.length <= 0) {
+          return <Empty />;
+      }
+      return <Table dataSource={students}
+                    columns={columns}
+                    bordered
+                    title={() => 'Students'}
+                    pagination={{ pageSize: 50 }}
+                    scroll={{ y: 240 }}
+                    rowKey = {(student) => student.id}
+              />;
   }
 
  return <Layout style={{minHeight: '100vh'}}>
